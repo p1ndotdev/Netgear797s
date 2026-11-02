@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face {
+    font-family: 'RobotoBold';
+    src: url('file:///mnt/hdata/lcd/fonts/Roboto-Bold.ttf');
+  }
+  @font-face {
+    font-family: 'Roboto';
+    src: url('file:///mnt/hdata/lcd/fonts/Roboto-Medium.ttf');
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 160px;
+    height: 128px;
+    overflow: hidden;
+    background: #000000;
+    color: #ffffff;
+    font-family: 'Roboto', sans-serif;
+  }
+  #viewport {
+    position: relative;
+    width: 160px;
+    height: 128px;
+    overflow: hidden;
+    background: #000000;
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+  }
+  .orb1 {
+    position: absolute;
+    width: 76px;
+    height: 76px;
+    border-radius: 38px;
+    top: -18px;
+    left: -14px;
+    background: -webkit-radial-gradient(center, ellipse cover, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 70%);
+  }
+  .orb2 {
+    position: absolute;
+    width: 84px;
+    height: 84px;
+    border-radius: 42px;
+    bottom: -22px;
+    right: -16px;
+    background: -webkit-radial-gradient(center, ellipse cover, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%);
+  }
+  .glass {
+    background: -webkit-linear-gradient(top, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 48%, rgba(255,255,255,0.08) 100%);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-top: 1px solid rgba(255,255,255,0.42);
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 2px 6px rgba(0,0,0,0.85);
+  }
+  .top-pill {
+    position: absolute;
+    top: 4px;
+    left: 5px;
+    right: 5px;
+    height: 20px;
+    border-radius: 10px;
+    padding: 3px 8px;
+    font-size: 9px;
+    letter-spacing: 0.6px;
+  }
+  .top-left {
+    float: left;
+    color: #f4f4f5;
+    font-family: 'RobotoBold', sans-serif;
+  }
+  .top-right {
+    float: right;
+    color: #4ade80;
+    font-family: 'RobotoBold', sans-serif;
+  }
+  .main-card {
+    position: absolute;
+    top: 28px;
+    left: 5px;
+    right: 5px;
+    height: 56px;
+    border-radius: 12px;
+    text-align: center;
+    padding-top: 4px;
+  }
+  .time-main {
+    font-family: 'RobotoBold', sans-serif;
+    font-size: 35px;
+    line-height: 36px;
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  }
+  .colon {
+    color: #e4e4e7;
+  }
+  .sec-badge {
+    font-family: 'RobotoBold', sans-serif;
+    font-size: 12px;
+    color: #a1a1aa;
+    vertical-align: top;
+    margin-left: 2px;
+  }
+  .date-str {
+    margin-top: 1px;
+    font-size: 9px;
+    color: #d4d4d8;
+    letter-spacing: 0.8px;
+  }
+  .perf-row {
+    position: absolute;
+    bottom: 4px;
+    left: 5px;
+    right: 5px;
+    height: 36px;
+  }
+  .mini-card {
+    float: left;
+    width: 47px;
+    height: 36px;
+    border-radius: 9px;
+    text-align: center;
+    padding-top: 3px;
+  }
+  .mc-mid {
+    margin-left: 4px;
+    margin-right: 4px;
+    width: 48px;
+  }
+  .lbl {
+    font-size: 7px;
+    color: #a1a1aa;
+    letter-spacing: 0.6px;
+  }
+  .val {
+    font-family: 'RobotoBold', sans-serif;
+    font-size: 11px;
+    line-height: 13px;
+    margin-top: 1px;
+  }
+  .c-cpu { color: #ffffff; }
+  .c-ram { color: #c084fc; }
+  .c-tmp { color: #fbbf24; }
+  .bar-bg {
+    width: 34px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.14);
+    margin: 3px auto 0 auto;
+    overflow: hidden;
+  }
+  .bar-fill-cpu { height: 3px; background: #ffffff; width: 10%; }
+  .bar-fill-ram { height: 3px; background: #c084fc; width: 35%; }
+  .bar-fill-tmp { height: 3px; background: #fbbf24; width: 45%; }
+
+  #reboot-modal {
+    display: none;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.88);
+    text-align: center;
+    padding-top: 38px;
+    z-index: 99;
+  }
+  .rb-box {
+    width: 134px;
+    margin: 0 auto;
+    padding: 10px 8px;
+    border-radius: 12px;
+  }
+  .rb-title {
+    font-family: 'RobotoBold', sans-serif;
+    font-size: 12px;
+    color: #ffffff;
+    letter-spacing: 0.8px;
+  }
+  .rb-sub {
+    font-size: 9px;
+    color: #a1a1aa;
+    margin-top: 4px;
+  }
+  .rb-bar-wrap {
+    width: 110px;
+    height: 4px;
+    background: rgba(255,255,255,0.16);
+    border-radius: 2px;
+    margin: 7px auto 0 auto;
+    overflow: hidden;
+  }
+  #rb-bar {
+    height: 4px;
+    width: 60%;
+    background: #fbbf24;
+  }
+</style>
+</head>
+<body>
+  <div id="viewport">
+    <div class="orb1"></div>
+    <div class="orb2"></div>
+
+    <div class="top-pill glass">
+      <span class="top-left" id="dayname">---</span>
+      <span class="top-right" id="batt">BAT --%</span>
+    </div>
+
+    <div class="main-card glass">
+      <div>
+        <span class="time-main" id="hm">--:--</span><span class="sec-badge" id="sec">--</span>
+      </div>
+      <div class="date-str" id="datestr">WAITING FOR SIM...</div>
+    </div>
+
+    <div class="perf-row">
+      <div class="mini-card glass">
+        <div class="lbl">CPU</div>
+        <div class="val c-cpu" id="cpuval">--%</div>
+        <div class="bar-bg"><div class="bar-fill-cpu" id="cpubar"></div></div>
+      </div>
+      <div class="mini-card mc-mid glass">
+        <div class="lbl">RAM</div>
+        <div class="val c-ram" id="ramval">--%</div>
+        <div class="bar-bg"><div class="bar-fill-ram" id="rambar"></div></div>
+      </div>
+      <div class="mini-card glass">
+        <div class="lbl">TEMP</div>
+        <div class="val c-tmp" id="tmpval">--°C</div>
+        <div class="bar-bg"><div class="bar-fill-tmp" id="tmpbar"></div></div>
+      </div>
+    </div>
+
+    <div id="reboot-modal">
+      <div class="rb-box glass">
+        <div class="rb-title" id="rb-title">HOLD TO REBOOT</div>
+        <div class="rb-sub" id="rb-sub">Keep holding...</div>
+        <div class="rb-bar-wrap"><div id="rb-bar"></div></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  var months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  var screenOn = true;
+  var lastHm = '';
+  var lastDate = '';
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function tick() {
+    if (!screenOn) return;
+    var d = new Date();
+    if (d.getFullYear() < 2020) {
+      if (lastHm !== 'WAIT') {
+        lastHm = 'WAIT';
+        document.getElementById('hm').innerHTML = '--:--';
+        document.getElementById('sec').innerHTML = '--';
+        document.getElementById('dayname').innerHTML = 'WAIT';
+        document.getElementById('datestr').innerHTML = 'WAITING FOR SIM...';
+      }
+      return;
+    }
+    var h = pad(d.getHours());
+    var m = pad(d.getMinutes());
+    var s = pad(d.getSeconds());
+    var hmStr = h + ':' + m;
+    if (hmStr !== lastHm) {
+      lastHm = hmStr;
+      document.getElementById('hm').innerHTML = hmStr;
+    }
+    document.getElementById('sec').innerHTML = s;
+    var dtKey = d.getDay() + '-' + d.getMonth() + '-' + d.getDate();
+    if (dtKey !== lastDate) {
+      lastDate = dtKey;
+      document.getElementById('dayname').innerHTML = days[d.getDay()];
+      document.getElementById('datestr').innerHTML = months[d.getMonth()] + ' ' + pad(d.getDate()) + ', ' + d.getFullYear();
+    }
+  }
+
+  function pollStats() {
+    try {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'file:///tmp/sysstat.json?t=' + new Date().getTime(), true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && (xhr.status === 0 || xhr.status === 200)) {
+          try {
+            var st = JSON.parse(xhr.responseText);
+            if (st.scr !== undefined) {
+              var wasOff = !screenOn;
+              screenOn = (st.scr === 1);
+              if (wasOff && screenOn) { lastHm = ''; tick(); }
+            }
+            if (st.hold !== undefined) {
+              var rm = document.getElementById('reboot-modal');
+              if (st.hold >= 1) {
+                rm.style.display = 'block';
+                if (st.hold >= 2) {
+                  document.getElementById('rb-title').innerHTML = 'REBOOTING...';
+                  document.getElementById('rb-sub').innerHTML = 'Please wait';
+                  document.getElementById('rb-bar').style.width = '100%';
+                  document.getElementById('rb-bar').style.background = '#4ade80';
+                } else {
+                  document.getElementById('rb-title').innerHTML = 'HOLD TO REBOOT';
+                  document.getElementById('rb-sub').innerHTML = 'Keep holding...';
+                  document.getElementById('rb-bar').style.width = '60%';
+                  document.getElementById('rb-bar').style.background = '#fbbf24';
+                }
+              } else {
+                rm.style.display = 'none';
+              }
+            }
+            if (!screenOn) return;
+            if (st.batt !== undefined) {
+              var el = document.getElementById('batt');
+              el.innerHTML = st.batt;
+              el.style.color = (st.usb === 1) ? '#4ade80' : '#e4e4e7';
+            }
+            if (st.cpu !== undefined) {
+              document.getElementById('cpuval').innerHTML = st.cpu + '%';
+              document.getElementById('cpubar').style.width = Math.min(100, Math.max(5, st.cpu)) + '%';
+            }
+            if (st.ram !== undefined) {
+              document.getElementById('ramval').innerHTML = st.ram + '%';
+              document.getElementById('rambar').style.width = Math.min(100, Math.max(5, st.ram)) + '%';
+            }
+            if (st.temp !== undefined) {
+              document.getElementById('tmpval').innerHTML = st.temp + '°C';
+              var tp = Math.round((st.temp - 25) * 100 / 50);
+              document.getElementById('tmpbar').style.width = Math.min(100, Math.max(5, tp)) + '%';
+            }
+          } catch (e) {}
+        }
+      };
+      xhr.send(null);
+    } catch (e) {}
+  }
+
+  setInterval(tick, 1000);
+  setInterval(pollStats, 3000);
+  setTimeout(function() { tick(); pollStats(); }, 200);
+</script>
+</body>
+</html>
